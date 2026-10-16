@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>รวมเครื่องมือสาขา</title>
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--text:#1d2330;--muted:#6a7385;--line:#e2e6ee;--accent:#1f6feb;--accent-bg:#e8f0fe;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12151b;--card:#1b2029;--text:#e8ecf3;--muted:#98a2b3;--line:#2b3240;--accent:#6aa3ff;--accent-bg:#1e2a44}}
+:root[data-theme="dark"]{--bg:#12151b;--card:#1b2029;--text:#e8ecf3;--muted:#98a2b3;--line:#2b3240;--accent:#6aa3ff;--accent-bg:#1e2a44}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:"Noto Sans Thai","Sarabun",system-ui,sans-serif;line-height:1.5}
+.wrap{max-width:900px;margin:0 auto;padding:32px 20px}
+h1{font-size:1.6rem;margin:0 0 4px}
+.sub{color:var(--muted);margin:0 0 20px}
+input{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--text);font:inherit;margin-bottom:20px}
+h3{font-size:.95rem;color:var(--muted);margin:22px 0 10px;font-weight:600}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+a.card{display:block;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;text-decoration:none;color:inherit;transition:transform .15s,border-color .15s}
+a.card:hover{transform:translateY(-2px);border-color:var(--accent)}
+.ic{font-size:1.8rem;width:52px;height:52px;display:grid;place-items:center;background:var(--accent-bg);border-radius:12px;margin-bottom:12px}
+.card h2{font-size:1.05rem;margin:0 0 4px}
+.card p{margin:0;color:var(--muted);font-size:.9rem}
+.tag{display:inline-block;margin-top:10px;font-size:.78rem;color:var(--accent)}
+.hide{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>รวมเครื่องมือสาขา</h1>
+<p class="sub">เลือกเครื่องมือที่ต้องการใช้งาน</p>
+<input id="q" type="search" placeholder="ค้นหาเครื่องมือ...">
+
+<h3>ป้ายราคาและโปรโมชั่น</h3>
+<div class="grid">
+<a class="card" href="price-labels.html"><div class="ic">🏷️</div><h2>ทำป้ายราคาสินค้า</h2><p>สแกนบาร์โค้ด พิมพ์ป้ายราคา และส่งออก PDF</p><span class="tag">เปิดใช้งาน →</span></a>
+<a class="card" href="pork-chicken-signs.html"><div class="ic">🥩</div><h2>ป้ายหมู-ไก่</h2><p>ป้ายธรรมดาและป้ายโปรโมชั่น หมู-ไก่</p><span class="tag">เปิดใช้งาน →</span></a>
+<a class="card" href="promo-a4.html"><div class="ic">📄</div><h2>ป้ายโปรโมชั่น A4</h2><p>2 ภาพ บน-ล่าง ในกระดาษ A4</p><span class="tag">เปิดใช้งาน →</span></a>
+<a class="card" href="poster-signs.html"><div class="ic">🖼️</div><h2>ทำป้ายโปสเตอร์สินค้า</h2><p>สร้างป้ายโปสเตอร์สำหรับสินค้า</p><span class="tag">เปิดใช้งาน →</span></a>
+</div>
+
+<h3>สต็อกและสินค้า</h3>
+<div class="grid">
+<a class="card" href="stock-scan.html"><div class="ic">📦</div><h2>นับสต็อกด้วยการสแกน</h2><p>สแกนเพื่อนับสต็อกสินค้า</p><span class="tag">เปิดใช้งาน →</span></a>
+<a class="card" href="count-tag.html"><div class="ic">🔖</div><h2>Count Tag – แท็คนับสต็อก</h2><p>ทำแท็คนับสต็อกพร้อมบาร์โค้ด</p><span class="tag">เปิดใช้งาน →</span></a>
+<a class="card" href="https://claude.ai/artifact/M7M5pLjRiyD4WbHEuoWN2g"><div class="ic">⏰</div><h2>บันทึกสินค้าใกล้หมดอายุ</h2><p>บันทึกและติดตามสินค้าใกล้หมดอายุ</p><span class="tag">เปิดผ่าน claude.ai →</span></a>
+</div>
+</div>
+<script>
+document.getElementById('q').addEventListener('input',function(e){
+var v=e.target.value.trim().toLowerCase();
+document.querySelectorAll('a.card').forEach(function(c){
+c.classList.toggle('hide',!!v&&c.textContent.toLowerCase().indexOf(v)<0);
+});
+});
+</script>
+</body>
+</html>
