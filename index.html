@@ -43,22 +43,28 @@ a.card:hover{transform:translateY(-2px);border-color:var(--accent)}
 <input id="q" type="search" placeholder="ค้นหาเครื่องมือ...">
 <div class="grid">
 <a class="card" href="price-labels.html" data-k="1. ป้ายราคาสินค้า"><div class="ic">🏷️</div><h2>1. ป้ายราคาสินค้า</h2><p>สแกนบาร์โค้ด พิมพ์ป้ายราคา และส่งออก PDF</p><span class="tag">เปิดใช้งาน →</span></a>
-<a class="card" href="price-sign-maker.html" data-k="2. ป้ายหมู-ไก่"><div class="ic">🥩</div><h2>2. ป้ายหมู-ไก่</h2><p>ป้ายธรรมดาและป้ายโปรโมชั่น หมู-ไก่</p><span class="tag">เปิดใช้งาน →</span></a>
+<a class="card" href="pork-chicken-signs.html" data-k="2. ป้ายหมู-ไก่"><div class="ic">🥩</div><h2>2. ป้ายหมู-ไก่</h2><p>ป้ายธรรมดาและป้ายโปรโมชั่น หมู-ไก่</p><span class="tag">เปิดใช้งาน →</span></a>
 <a class="card" href="stock-scan.html" data-k="3. นับสต็อกด้วยการสแกน"><div class="ic">📦</div><h2>3. นับสต็อกด้วยการสแกน</h2><p>สแกนเพื่อนับสต็อกสินค้า</p><span class="tag">เปิดใช้งาน →</span></a>
 <a class="card" href="count-tag.html" data-k="4. Count Tag"><div class="ic">🔖</div><h2>4. Count Tag</h2><p>ทำแท็คนับสต็อกพร้อมบาร์โค้ด</p><span class="tag">เปิดใช้งาน →</span></a>
 <a class="card" href="poster-signs.html" data-k="5. ทำป้ายโปสเตอร์"><div class="ic">🖼️</div><h2>5. ทำป้ายโปสเตอร์</h2><p>สร้างป้ายโปสเตอร์สำหรับสินค้า</p><span class="tag">เปิดใช้งาน →</span></a>
 <a class="card" href="promo-a4.html" data-k="6. ป้ายโปรโมชั่น"><div class="ic">📄</div><h2>6. ป้ายโปรโมชั่น</h2><p>ป้ายโปรโมชั่น 2 ภาพ บน-ล่าง ในกระดาษ A4</p><span class="tag">เปิดใช้งาน →</span></a>
 </div></div>
 <script>
-var U="admin",P="MTIzNDU2",TTL=43200000;
-function ok(){try{var t=+localStorage.getItem("tfm_auth_ts");return t&&Date.now()-t<TTL}catch(e){return false}}
-function show(){var a=ok();document.getElementById("login").classList.toggle("hide",a);document.getElementById("menu").classList.toggle("hide",!a)}
-function login(){var u=document.getElementById("u").value.trim(),p=document.getElementById("p").value;
-if(u===U&&btoa(p)===P){try{localStorage.setItem("tfm_auth_ts",Date.now())}catch(e){}document.getElementById("err").textContent="";show()}
-else document.getElementById("err").textContent="ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง"}
+var TTL=43200000;
+// accounts: u=username, p=base64(password), exp=expiry (ms epoch, 0 = never)
+var ACC=[{u:"admin",p:"MTIzNDU2",exp:0},{u:"T6802005",p:"MTMwMzM4",exp:1793725199000}]; // T6802005 หมดอายุ 3 พ.ย. 2569 23:59
+function S(k){try{return sessionStorage.getItem(k)}catch(e){return null}}
+function ok(){var t=+S("tfm_auth_ts"),x=+S("tfm_auth_exp");return !!t&&Date.now()-t<TTL&&!(x&&Date.now()>x)}
+function show(){var a=ok();if(!a){try{sessionStorage.removeItem("tfm_auth_ts");sessionStorage.removeItem("tfm_auth_exp")}catch(e){}}document.getElementById("login").classList.toggle("hide",a);document.getElementById("menu").classList.toggle("hide",!a)}
+function login(){var u=document.getElementById("u").value.trim(),p=document.getElementById("p").value,e=document.getElementById("err"),f=null;
+for(var i=0;i<ACC.length;i++){if(ACC[i].u===u&&btoa(p)===ACC[i].p){f=ACC[i];break}}
+if(!f){e.textContent="ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง";return}
+if(f.exp&&Date.now()>f.exp){e.textContent="รหัสผ่านนี้หมดอายุแล้ว";return}
+try{sessionStorage.setItem("tfm_auth_ts",Date.now());sessionStorage.setItem("tfm_auth_exp",f.exp)}catch(x){}
+e.textContent="";show()}
 document.getElementById("go").onclick=login;
 document.getElementById("p").onkeydown=function(e){if(e.key==="Enter")login()};
-document.getElementById("out").onclick=function(){try{localStorage.removeItem("tfm_auth_ts")}catch(e){}document.getElementById("p").value="";show()};
+document.getElementById("out").onclick=function(){try{sessionStorage.removeItem("tfm_auth_ts");sessionStorage.removeItem("tfm_auth_exp")}catch(e){}document.getElementById("p").value="";show()};
 document.getElementById("q").oninput=function(e){var v=e.target.value.trim().toLowerCase();document.querySelectorAll("a.card").forEach(function(c){c.classList.toggle("hide",!!v&&c.textContent.toLowerCase().indexOf(v)<0)})};
 show();
 </script></body></html>
