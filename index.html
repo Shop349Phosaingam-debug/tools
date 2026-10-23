@@ -1,22 +1,27 @@
 <!DOCTYPE html>
-<html lang="th">
-<head>
-<meta charset="utf-8">
+<html lang="th"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>รวมเครื่องมือสาขา</title>
 <style>
-:root{--bg:#f6f7f9;--card:#fff;--text:#1d2330;--muted:#6a7385;--line:#e2e6ee;--accent:#1f6feb;--accent-bg:#e8f0fe;
-box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12151b;--card:#1b2029;--text:#e8ecf3;--muted:#98a2b3;--line:#2b3240;--accent:#6aa3ff;--accent-bg:#1e2a44}}
-:root[data-theme="dark"]{--bg:#12151b;--card:#1b2029;--text:#e8ecf3;--muted:#98a2b3;--line:#2b3240;--accent:#6aa3ff;--accent-bg:#1e2a44}
-html{scroll-padding-top:env(safe-area-inset-top,0px)}
+:root{--bg:#f6f7f9;--card:#fff;--text:#1d2330;--muted:#6a7385;--line:#e2e6ee;--accent:#1f6feb;--accent-bg:#e8f0fe;--err:#d92d20}
+@media (prefers-color-scheme:dark){:root{--bg:#12151b;--card:#1b2029;--text:#e8ecf3;--muted:#98a2b3;--line:#2b3240;--accent:#6aa3ff;--accent-bg:#1e2a44;--err:#ff7b72}}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font-family:"Noto Sans Thai","Sarabun",system-ui,sans-serif;line-height:1.5}
-.wrap{max-width:900px;margin:0 auto;padding:32px 20px}
-h1{font-size:1.6rem;margin:0 0 4px}
-.sub{color:var(--muted);margin:0 0 20px}
-input{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--text);font:inherit;margin-bottom:20px}
-h3{font-size:.95rem;color:var(--muted);margin:22px 0 10px;font-weight:600}
+.hide{display:none!important}
+#login{min-height:100vh;display:grid;place-items:center;padding:20px}
+.box{width:100%;max-width:360px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:28px}
+.box h1{font-size:1.3rem;margin:0 0 4px;text-align:center}
+.box p{margin:0 0 18px;color:var(--muted);text-align:center;font-size:.9rem}
+label{display:block;font-size:.85rem;color:var(--muted);margin:10px 0 4px}
+input{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--text);font:inherit}
+button{width:100%;margin-top:16px;padding:12px;border:0;border-radius:10px;background:var(--accent);color:#fff;font:inherit;font-weight:600;cursor:pointer}
+#err{color:var(--err);font-size:.85rem;margin-top:10px;text-align:center;min-height:1.2em}
+.wrap{max-width:900px;margin:0 auto;padding:28px 20px}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:18px}
+h2.t{font-size:1.6rem;margin:0}
+.sub{color:var(--muted);margin:2px 0 0}
+.out{width:auto;margin:0;padding:8px 14px;background:transparent;color:var(--text);border:1px solid var(--line);font-weight:500}
+#q{margin-bottom:20px}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
 a.card{display:block;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;text-decoration:none;color:inherit;transition:transform .15s,border-color .15s}
 a.card:hover{transform:translateY(-2px);border-color:var(--accent)}
@@ -24,37 +29,36 @@ a.card:hover{transform:translateY(-2px);border-color:var(--accent)}
 .card h2{font-size:1.05rem;margin:0 0 4px}
 .card p{margin:0;color:var(--muted);font-size:.9rem}
 .tag{display:inline-block;margin-top:10px;font-size:.78rem;color:var(--accent)}
-.hide{display:none}
-</style>
-</head>
+</style></head>
 <body>
-<div class="wrap">
-<h1>รวมเครื่องมือสาขา</h1>
-<p class="sub">เลือกเครื่องมือที่ต้องการใช้งาน</p>
+<div id="login"><div class="box">
+<h1>🔒 เข้าสู่ระบบ</h1><p>รวมเครื่องมือสาขา</p>
+<label for="u">ชื่อผู้ใช้</label><input id="u" autocomplete="username">
+<label for="p">รหัสผ่าน</label><input id="p" type="password" autocomplete="current-password">
+<button id="go">เข้าสู่ระบบ</button><div id="err"></div>
+</div></div>
+<div id="menu" class="wrap hide">
+<div class="top"><div><h2 class="t">รวมเครื่องมือสาขา</h2><p class="sub">เลือกเครื่องมือที่ต้องการใช้งาน</p></div>
+<button class="out" id="out">ออกจากระบบ</button></div>
 <input id="q" type="search" placeholder="ค้นหาเครื่องมือ...">
-
-<h3>ป้ายราคาและโปรโมชั่น</h3>
 <div class="grid">
-<a class="card" href="price-labels.html"><div class="ic">🏷️</div><h2>ทำป้ายราคาสินค้า</h2><p>สแกนบาร์โค้ด พิมพ์ป้ายราคา และส่งออก PDF</p><span class="tag">เปิดใช้งาน →</span></a>
-<a class="card" href="pork-chicken-signs.html"><div class="ic">🥩</div><h2>ป้ายหมู-ไก่</h2><p>ป้ายธรรมดาและป้ายโปรโมชั่น หมู-ไก่</p><span class="tag">เปิดใช้งาน →</span></a>
-<a class="card" href="promo-a4.html"><div class="ic">📄</div><h2>ป้ายโปรโมชั่น A4</h2><p>2 ภาพ บน-ล่าง ในกระดาษ A4</p><span class="tag">เปิดใช้งาน →</span></a>
-<a class="card" href="poster-signs.html"><div class="ic">🖼️</div><h2>ทำป้ายโปสเตอร์สินค้า</h2><p>สร้างป้ายโปสเตอร์สำหรับสินค้า</p><span class="tag">เปิดใช้งาน →</span></a>
-</div>
-
-<h3>สต็อกและสินค้า</h3>
-<div class="grid">
-<a class="card" href="stock-scan.html"><div class="ic">📦</div><h2>นับสต็อกด้วยการสแกน</h2><p>สแกนเพื่อนับสต็อกสินค้า</p><span class="tag">เปิดใช้งาน →</span></a>
-<a class="card" href="count-tag.html"><div class="ic">🔖</div><h2>Count Tag – แท็คนับสต็อก</h2><p>ทำแท็คนับสต็อกพร้อมบาร์โค้ด</p><span class="tag">เปิดใช้งาน →</span></a>
-<a class="card" href="https://claude.ai/artifact/M7M5pLjRiyD4WbHEuoWN2g"><div class="ic">⏰</div><h2>บันทึกสินค้าใกล้หมดอายุ</h2><p>บันทึกและติดตามสินค้าใกล้หมดอายุ</p><span class="tag">เปิดผ่าน claude.ai →</span></a>
-</div>
-</div>
+<a class="card" href="price-labels.html" data-k="1. ป้ายราคาสินค้า"><div class="ic">🏷️</div><h2>1. ป้ายราคาสินค้า</h2><p>สแกนบาร์โค้ด พิมพ์ป้ายราคา และส่งออก PDF</p><span class="tag">เปิดใช้งาน →</span></a>
+<a class="card" href="pork-chicken-signs.html" data-k="2. ป้ายหมู-ไก่"><div class="ic">🥩</div><h2>2. ป้ายหมู-ไก่</h2><p>ป้ายธรรมดาและป้ายโปรโมชั่น หมู-ไก่</p><span class="tag">เปิดใช้งาน →</span></a>
+<a class="card" href="stock-scan.html" data-k="3. นับสต็อกด้วยการสแกน"><div class="ic">📦</div><h2>3. นับสต็อกด้วยการสแกน</h2><p>สแกนเพื่อนับสต็อกสินค้า</p><span class="tag">เปิดใช้งาน →</span></a>
+<a class="card" href="count-tag.html" data-k="4. Count Tag"><div class="ic">🔖</div><h2>4. Count Tag</h2><p>ทำแท็คนับสต็อกพร้อมบาร์โค้ด</p><span class="tag">เปิดใช้งาน →</span></a>
+<a class="card" href="poster-signs.html" data-k="5. ทำป้ายโปสเตอร์"><div class="ic">🖼️</div><h2>5. ทำป้ายโปสเตอร์</h2><p>สร้างป้ายโปสเตอร์สำหรับสินค้า</p><span class="tag">เปิดใช้งาน →</span></a>
+<a class="card" href="promo-a4.html" data-k="6. ป้ายโปรโมชั่น"><div class="ic">📄</div><h2>6. ป้ายโปรโมชั่น</h2><p>ป้ายโปรโมชั่น 2 ภาพ บน-ล่าง ในกระดาษ A4</p><span class="tag">เปิดใช้งาน →</span></a>
+</div></div>
 <script>
-document.getElementById('q').addEventListener('input',function(e){
-var v=e.target.value.trim().toLowerCase();
-document.querySelectorAll('a.card').forEach(function(c){
-c.classList.toggle('hide',!!v&&c.textContent.toLowerCase().indexOf(v)<0);
-});
-});
-</script>
-</body>
-</html>
+var U="admin",P="MTIzNDU2",TTL=43200000;
+function ok(){try{var t=+localStorage.getItem("tfm_auth_ts");return t&&Date.now()-t<TTL}catch(e){return false}}
+function show(){var a=ok();document.getElementById("login").classList.toggle("hide",a);document.getElementById("menu").classList.toggle("hide",!a)}
+function login(){var u=document.getElementById("u").value.trim(),p=document.getElementById("p").value;
+if(u===U&&btoa(p)===P){try{localStorage.setItem("tfm_auth_ts",Date.now())}catch(e){}document.getElementById("err").textContent="";show()}
+else document.getElementById("err").textContent="ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง"}
+document.getElementById("go").onclick=login;
+document.getElementById("p").onkeydown=function(e){if(e.key==="Enter")login()};
+document.getElementById("out").onclick=function(){try{localStorage.removeItem("tfm_auth_ts")}catch(e){}document.getElementById("p").value="";show()};
+document.getElementById("q").oninput=function(e){var v=e.target.value.trim().toLowerCase();document.querySelectorAll("a.card").forEach(function(c){c.classList.toggle("hide",!!v&&c.textContent.toLowerCase().indexOf(v)<0)})};
+show();
+</script></body></html>
