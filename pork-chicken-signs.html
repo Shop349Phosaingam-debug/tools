@@ -171,17 +171,23 @@ document.addEventListener('click',e=>{const t=e.target.closest('button');if(!t)r
  if(t.dataset.c)Q.push({c:+t.dataset.c,t:S.tpl,pr:'',n:1,aj:AJ()||S.tpl==='adj',pc:$('#pct').value});
  else if(t.dataset.x!=null)Q.splice(+t.dataset.x,1);
  else if(t.dataset.n!=null){const it=Q[+t.dataset.n];it.n=Math.max(1,it.n+ +t.dataset.d)}
- else if(t.id==='clr')Q.length=0;else if(t.id==='prt'){try{window.print()}catch(e){alert('พิมพ์ในหน้านี้ไม่ได้ ใช้ปุ่มดาวน์โหลดไฟล์ป้ายแทน')}return}else return;draw()});
+ else if(t.id==='clr')Q.length=0;else if(t.id==='prt'){printSigns();return}else return;draw()});
 document.addEventListener('change',e=>{const t=e.target,Q=S.q.promo;
  if(t.dataset.ov!=null){const p=B[t.dataset.ov],v=t.value===''?null:+t.value;if(v==null||v===p.p0)delete OV[p.c];else OV[p.c]=v;rf(p);sv();drawP();return}
  if(t.id==='tpl')S.tpl=t.value;else if(t.dataset.t!=null)Q[+t.dataset.t].t=t.value;else if(t.dataset.p!=null)Q[+t.dataset.p].pr=t.value;else if(t.dataset.pc!=null)Q[+t.dataset.pc].pc=t.value;
  else if(t.id==='dt')S.dt=t.value;draw()});
 ['se','cat','only','pct','end','pm','adjo'].forEach(i=>$('#'+i).addEventListener('input',draw));
-$('#dl').onclick=async()=>{let d=null;try{d=await claude.use('downloads')}catch(e){}
- if(!d){alert('ดาวน์โหลดไม่ได้ในมุมมองนี้ ลองกด "พิมพ์ในหน้านี้" หรือเปิดลิงก์ในเบราว์เซอร์');return}
- if(!$('#pages .page')){alert('ยังไม่มีป้ายในคิว');return}
- const h=`<!doctype html><html lang="th"><head><meta charset="utf-8"><title>ป้ายราคา</title><link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600;700;800&display=swap" rel="stylesheet"><style>${document.querySelector('style').textContent}</style></head><body><div class="ui"><div class="pv"><div class="pages">${$('#pages').innerHTML}</div></div></div><script>onload=()=>setTimeout(()=>print(),700)<\/script></body></html>`;
- try{await d.save({filename:'ป้ายราคา.html',data:new Blob([h],{type:'text/html'})})}catch(e){}};
+const pdoc=()=>`<!doctype html><html lang="th"><head><meta charset="utf-8"><title>ป้ายราคา</title><link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600;700;800&display=swap" rel="stylesheet"><style>${document.querySelector('style').textContent}</style></head><body><div class="ui"><div class="pv"><div class="pages">${$('#pages').innerHTML}</div></div></div><script>onload=()=>setTimeout(()=>print(),700)<\/script></body></html>`;
+async function dlSigns(){if(!$('#pages .page')){alert('ยังไม่มีป้ายในคิว');return}
+ const blob=new Blob([pdoc()],{type:'text/html'});let d=null;try{if(window.claude&&claude.use)d=await claude.use('downloads')}catch(e){}
+ if(d){try{await d.save({filename:'ป้ายราคา.html',data:blob});return}catch(e){}}
+ const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='ป้ายราคา.html';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},4000)}
+function printSigns(){if(!$('#pages .page')){alert('ยังไม่มีป้ายในคิว');return}
+ let fr=false;try{fr=window.self!==window.top}catch(e){fr=true}
+ if(!fr){try{window.print();return}catch(e){}}
+ const w=window.open(URL.createObjectURL(new Blob([pdoc()],{type:'text/html'})),'_blank');
+ if(!w){try{window.print();return}catch(e){}alert('เบราว์เซอร์บล็อกหน้าต่างพิมพ์ — อนุญาตป๊อปอัปของเว็บนี้ หรือกด "ดาวน์โหลดไฟล์ป้าย" แล้วเปิดไฟล์เพื่อพิมพ์')}}
+$('#dl').onclick=dlSigns;
 const OV=(()=>{try{return JSON.parse(localStorage.getItem('ov')||'{}')}catch(e){return{}}})();
 D.P.forEach(p=>{p.p1=p.p;p.d1=p.d;p.o1=p.o;p.p0=p.p;p.d0=p.d;p.o0=p.o});const D0DT=D.dt;let IMP=null;try{IMP=JSON.parse(localStorage.getItem('imp')||'null')}catch(e){}
 if(IMP&&IMP.base===D0DT&&IMP.m){D.P.forEach(p=>{const v=IMP.m[p.c];if(v){p.p0=v[0];p.o0=v[1];p.d0=v[2]}else p.d0=0});if(IMP.dt)D.dt=IMP.dt}else IMP=null;
