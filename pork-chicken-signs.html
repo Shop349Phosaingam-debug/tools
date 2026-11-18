@@ -102,7 +102,8 @@ label{font-size:16px;color:var(--mu);display:flex;gap:6px;align-items:center}
 </style></head><body><div class="ui">
 <h1>🏷️ ระบบทำป้ายราคา / ป้ายโปรโมชั่น</h1>
 <div class="row tabs"><button data-v="mk" class="on">ทำป้าย</button><button data-v="pr">แก้ไขราคาสินค้า</button></div>
-<div class="card dz" id="dz"><div class="row" style="justify-content:space-between"><span><b>📥 นำเข้าไฟล์ราคาใหม่ (Excel)</b><br><small style="color:var(--mu)">กดปุ่มหรือลากไฟล์มาวางในหน้านี้ได้เลย · จับคู่รหัสสินค้าจากคอลัมน์ D · ราคาใหม่จากคอลัมน์ DB</small></span><button class="btn" id="imp">เลือกไฟล์ Excel</button><input type="file" id="impf" accept=".xlsx,.xlsm,.xls" hidden></div><div id="impst" style="margin-top:6px;color:var(--mu)"></div><div id="impres"></div></div>
+<div class="card dz" id="dz"><div class="row" style="justify-content:space-between"><span><b>📥 นำเข้าไฟล์ราคาใหม่ (Excel)</b><br><small style="color:var(--mu)">กดปุ่มหรือลากไฟล์มาวางในหน้านี้ได้เลย · จับคู่รหัสสินค้าจากคอลัมน์ D · อ่านราคาทุกเขตจากแถวที่ 4 (เขต 1A, 1B, …) แล้วเลือกเขตที่ต้องการได้</small></span><button class="btn" id="imp">เลือกไฟล์ Excel</button><input type="file" id="impf" accept=".xlsx,.xlsm,.xls" hidden></div><div id="znw" class="row" style="display:none;margin-top:8px"><label style="color:var(--fg)"><b>📍 เลือกเขตราคา</b> <select id="zn" style="min-width:140px"></select></label><small style="color:var(--mu)">เลือกแล้วราคาและป้ายทั้งหมดจะใช้ราคาของเขตนี้ (จำค่าไว้ในเครื่องนี้)</small></div>
+<div id="impst" style="margin-top:6px;color:var(--mu)"></div><div id="impres"></div></div>
 <div class="card" id="holdn" style="display:none"></div>
 <div id="vmk"><div class="card" id="fsbox"></div><div class="card top"><div class="row">
 <label>รูปแบบป้าย <select id="tpl"></select></label><label><input type="checkbox" id="adjo">เฉพาะสินค้าที่ปรับราคา</label>
@@ -204,7 +205,9 @@ function printSigns(){if(!$('#pages .page')){alert('ยังไม่มีป�
 $('#dl').onclick=dlSigns;
 const OV=(()=>{try{return JSON.parse(localStorage.getItem('ov')||'{}')}catch(e){return{}}})();
 D.P.forEach(p=>{p.p1=p.p;p.d1=p.d;p.o1=p.o;p.p0=p.p;p.d0=p.d;p.o0=p.o});const D0DT=D.dt;let IMP=null;try{IMP=JSON.parse(localStorage.getItem('imp')||'null')}catch(e){}
-if(IMP&&IMP.base===D0DT&&IMP.m){D.P.forEach(p=>{const v=IMP.m[p.c];if(v){p.p0=v[0];p.o0=v[1];p.d0=v[2]}else p.d0=0});if(IMP.dt)D.dt=IMP.dt}else IMP=null;
+let ZSEL='',ZSRC=null;try{ZSEL=localStorage.getItem('zone')||''}catch(e){}
+const zm=(s,z)=>{if(!s||!s.m)return{};const e=s.zd&&z&&z!==s.zb&&s.zd[z];if(!e)return s.m;const r=Object.assign({},s.m),cl=s.cl||[];e.split(';').forEach(t=>{if(!t)return;const a=t.split(':').map(Number),c=cl[a[0]];if(c==null)return;r[c]=[a[1],a[2],a.length>3?a[3]:Math.round((a[1]-a[2])*100)/100]});return r};
+if(IMP&&IMP.base===D0DT&&IMP.m){ZSRC=IMP;const mz=zm(IMP,ZSEL);D.P.forEach(p=>{const v=mz[p.c];if(v){p.p0=v[0];p.o0=v[1];p.d0=v[2]}else p.d0=0});if(IMP.dt)D.dt=IMP.dt}else IMP=null;
 const HOLD={until:'2026-10-11',codes:[2400000685,2400000202,2400000060,2400000081,2400000145]};
 const TEMP={round:'03 - 09 ต.ค. 69',until:'2026-10-16',prices:{2400000685:103,2400000060:121,2400000062:135,2400000202:151,2400000088:130}};
 const holdOn=(u=HOLD.until)=>{const t=new Date(),d=`${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`;return d<=u};
@@ -223,12 +226,12 @@ const SHR={db:null,cur:null,ts:0,applied:false,confirm:0};
 function shNote(){const d=SHR.cur;
  if(d&&d.base===D0DT&&d.m){impShow(`🌐 ใช้ราคาที่ใช้ร่วมกันทุกเครื่อง: <b>${E(d.name||'')}</b>${d.dt?' · รอบ '+E(d.dt):''} <button class="btn g" id="imprs" style="margin-left:8px">↩️ กลับไปใช้ราคาเริ่มต้นของระบบ</button>`)}
  else if(IMP&&SHR.db){impShow(`ใช้ราคาจากไฟล์ที่นำเข้าไว้ (เฉพาะเครื่องนี้): <b>${E(IMP.name)}</b>${IMP.dt?' · รอบ '+E(IMP.dt):''} <button class="btn" id="impsh" style="margin-left:8px">🌐 แชร์ราคานี้ให้ทุกเครื่อง</button> <button class="btn g" id="imprs">↩️ กลับไปใช้ราคาเริ่มต้นของระบบ</button>`)}}
-function applyShared(m,dt){D.P.forEach(p=>{p.p0=p.p1;p.o0=p.o1;p.d0=p.d1});D.P.forEach(p=>{const v=m[p.c];if(v){p.p0=v[0];p.o0=v[1];p.d0=v[2];if(OV[p.c]!=null)delete OV[p.c]}else p.d0=0});D.dt=dt||D0DT;S.dt=D.dt;$('#dt').value=D.dt;D.P.forEach(rf);sv();drawP();draw();holdNote()}
+function applyShared(m,dt,src){ZSRC=src||null;D.P.forEach(p=>{p.p0=p.p1;p.o0=p.o1;p.d0=p.d1});D.P.forEach(p=>{const v=m[p.c];if(v){p.p0=v[0];p.o0=v[1];p.d0=v[2];if(OV[p.c]!=null)delete OV[p.c]}else p.d0=0});D.dt=dt||D0DT;S.dt=D.dt;$('#dt').value=D.dt;D.P.forEach(rf);sv();drawP();draw();holdNote();zui()}
 function onShared(snap){const d=snap.exists?snap.data():null;SHR.cur=d;
- if(!d||d.base!==D0DT||!d.m){if(SHR.applied&&!d){SHR.applied=false;SHR.ts=0;applyShared(IMP&&IMP.m&&IMP.base===D0DT?IMP.m:{},IMP&&IMP.dt||D0DT);if(!(IMP&&IMP.m))D.P.forEach(p=>{p.d0=p.d1});D.P.forEach(rf);drawP();draw();holdNote()}shNote();return}
+ if(!d||d.base!==D0DT||!d.m){if(SHR.applied&&!d){SHR.applied=false;SHR.ts=0;applyShared(IMP&&IMP.m&&IMP.base===D0DT?zm(IMP,ZSEL):{},IMP&&IMP.dt||D0DT,IMP&&IMP.m&&IMP.base===D0DT?IMP:null);if(!(IMP&&IMP.m))D.P.forEach(p=>{p.d0=p.d1});D.P.forEach(rf);drawP();draw();holdNote()}shNote();return}
  if(SHR.ts===d.ts)return
  if(IMP&&IMP.ts&&IMP.ts>d.ts){shNote();return}
- SHR.ts=d.ts;SHR.applied=true;applyShared(d.m,d.dt);shNote()}
+ SHR.ts=d.ts;SHR.applied=true;applyShared(zm(d,ZSEL),d.dt,d);shNote()}
 async function doImport(file){
  if(!file)return;
  if(!/\.xls[xmb]?$/i.test(file.name))return impShow('⚠️ ต้องเป็นไฟล์ Excel (.xlsx)',1);
@@ -237,31 +240,41 @@ async function doImport(file){
  let wb;try{wb=XLSX.read(await file.arrayBuffer(),{type:'array'})}catch(e){return impShow('⚠️ อ่านไฟล์ไม่ได้: '+E(e.message),1)}
  const hid={};((wb.Workbook&&wb.Workbook.Sheets)||[]).forEach(x=>{hid[x.name]=x.Hidden});
  let names=wb.SheetNames.filter(n=>!hid[n]);const pick=names.filter(n=>n.startsWith('ราคาขาย'));if(pick.length)names=pick;
- const found=new Map(),bad=[];let zone='',label=null;
+ const bad=[],zf={},zc={};let label=null;
  for(const sn of names){const ws=wb.Sheets[sn];if(!ws||!ws['!ref'])continue;
   const rg=XLSX.utils.decode_range(ws['!ref']);rg.s.c=0;rg.s.r=0;
   const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:null,range:XLSX.utils.encode_range(rg)});
   const hi=rows.findIndex(x=>x&&String(x[IC.c]||'').includes('รหัสสินค้า'));if(hi<0)continue;
-  const hn=String(rows[hi][IC.n]||'');if(!hn.includes('รอบ')){bad.push(`${sn}: หัวคอลัมน์ DB คือ "${hn}"`);continue}
-  const z=rows[hi-1]&&rows[hi-1][IC.o];if(z&&!zone)zone=String(z).trim();if(!label)label=roundLabel(hn);
-  for(let i=hi+1;i<rows.length;i++){const x=rows[i];if(!x)continue;const c=Number(x[IC.c]);if(!(c>=1e9))continue;const db=x[IC.n];if(typeof db!=='number')continue;
-   found.set(c,{db,da:typeof x[IC.o]==='number'?x[IC.o]:null,dc:typeof x[IC.d]==='number'?x[IC.d]:null,name:String(x[4]||'').trim()})}}
+  const hr=rows[hi],zr=rows[hi-1]||[],zs=[];
+  zr.forEach((v,ci)=>{if(ci<5||v==null)return;const z=String(v).replace(/\s+/g,' ').trim();if(/^เขต\s?\S+$/.test(z)&&String(hr[ci+1]||'').includes('รอบ'))zs.push([z,ci])});
+  if(!zs.length){const hn=String(hr[IC.n]||'');if(!hn.includes('รอบ')){bad.push(`${sn}: หัวคอลัมน์ DB คือ "${hn}"`);continue}const z0=zr[IC.o];zs.push([z0?String(z0).replace(/\s+/g,' ').trim():'เขต',IC.o])}
+  if(!label)label=roundLabel(String(hr[zs[0][1]+1]||''));
+  for(const [z,ci] of zs){if(zc[z]==null)zc[z]=ci;const mp=zf[z]||(zf[z]=new Map());
+   for(let i=hi+1;i<rows.length;i++){const x=rows[i];if(!x)continue;const c=Number(x[IC.c]);if(!(c>=1e9))continue;const db=x[ci+1];if(typeof db!=='number')continue;
+    mp.set(c,{db,da:typeof x[ci]==='number'?x[ci]:null,dc:typeof x[ci+2]==='number'?x[ci+2]:null,name:String(x[4]||'').trim()})}}}
+ const znl=Object.keys(zf).filter(z=>zf[z].size);
+ const found={size:znl.length};
  if(!found.size)return impShow('⚠️ ไม่พบข้อมูลราคาที่อ่านได้'+(bad.length?' ('+E(bad.join(' · '))+')':' — ต้องมีชีตที่คอลัมน์ D เป็นรหัสสินค้า และคอลัมน์ DB เป็นราคารอบใหม่'),1);
+ const zb=znl.find(z=>zc[z]===IC.o)||znl[0],sel=(ZSEL&&zf[ZSEL]&&zf[ZSEL].size)?ZSEL:zb;
+ const r2b=x=>Math.round(x*100)/100,cl=D.P.map(p=>p.c);
+ const mk=mp=>{const r={};D.P.forEach(p=>{const v=mp&&mp.get(p.c);if(!v)return;const o=v.da!=null?v.da:p.o1,d=v.dc!=null?v.dc:(v.da!=null?r2b(v.db-v.da):0);r[p.c]=[v.db,o,d]});return r};
+ const m=mk(zf[zb]),zd={};
+ znl.forEach(z=>{if(z===zb)return;const mz=mk(zf[z]),out=[];cl.forEach((c,i)=>{const b=mz[c],a=m[c];if(!b)return;if(a&&a[0]===b[0]&&a[1]===b[1]&&a[2]===b[2])return;out.push(i+':'+b[0]+':'+b[1]+(b[2]!==r2b(b[0]-b[1])?':'+b[2]:''))});if(out.length)zd[z]=out.join(';')});
+ const ts=Date.now();ZSEL=sel;try{localStorage.setItem('zone',sel)}catch(e){}
+ IMP={base:D0DT,dt:label||D.dt,name:file.name,m,zb,zn:znl,cl,zd,ts};ZSRC=IMP;
+ const ms=zm(IMP,sel),fsel=zf[sel]||new Map();
  D.P.forEach(p=>{p.p0=p.p1;p.o0=p.o1;p.d0=0});
- const m={},changed=[],miss=[];let cleared=0;
- D.P.forEach(p=>{const v=found.get(p.c);if(!v)return;const prev=p.p1;
-  const o=v.da!=null?v.da:p.o1,d=v.dc!=null?v.dc:(v.da!=null?r2(v.db-v.da):0);
-  p.p0=v.db;p.o0=o;p.d0=d;m[p.c]=[v.db,o,d];if(prev!==v.db)changed.push({p,prev,db:v.db});
-  if(OV[p.c]!=null){delete OV[p.c];cleared++}});
- const have=new Set(D.P.map(p=>p.c));found.forEach((v,c)=>{if(!have.has(c))miss.push({c,name:v.name,db:v.db})});
- const notIn=D.P.filter(p=>!found.has(p.c)).length;
+ const changed=[],miss=[];let cleared=0;
+ D.P.forEach(p=>{const v=ms[p.c];if(!v)return;const prev=p.p1;p.p0=v[0];p.o0=v[1];p.d0=v[2];if(prev!==v[0])changed.push({p,prev,db:v[0]});if(OV[p.c]!=null){delete OV[p.c];cleared++}});
+ const have=new Set(D.P.map(p=>p.c));fsel.forEach((v,c)=>{if(!have.has(c))miss.push({c,name:v.name,db:v.db})});
+ const notIn=D.P.filter(p=>!fsel.has(p.c)).length;
  D.P.forEach(rf);sv();
- const ts=Date.now();IMP={base:D0DT,dt:label||D.dt,name:file.name,m,ts};try{localStorage.setItem('imp',JSON.stringify(IMP))}catch(e){}
- let shm='';if(SHR.db){try{await SHR.db.doc('prices/current').set({base:D0DT,dt:label||D.dt,name:file.name,ts,m});SHR.ts=ts;SHR.applied=true;shm='🌐 บันทึกราคาให้ <b>ทุกเครื่อง</b> แล้ว — เครื่องอื่นจะเห็นราคานี้เมื่อเปิดหรือรีเฟรชหน้า'}catch(e){shm='⚠️ บันทึกไว้เฉพาะ<b>เครื่องนี้</b> — บัญชีนี้ไม่มีสิทธิ์แก้ข้อมูลที่ใช้ร่วมกัน ให้เจ้าของหรือผู้แก้ไขเป็นคนนำเข้าไฟล์'}}else shm='⚠️ บันทึกไว้เฉพาะ<b>เครื่องนี้</b> — ต้องเปิดผ่านลิงก์ claude.ai และเข้าสู่ระบบ จึงจะแชร์ราคาให้ทุกเครื่องได้';
+ let lsok=true;try{localStorage.setItem('imp',JSON.stringify(IMP))}catch(e){lsok=false}
+ let shm='';if(SHR.db){try{const pay={base:D0DT,dt:label||D.dt,name:file.name,ts,m,zb,zn:znl,cl,zd};if(JSON.stringify(pay).length>245000)throw new Error('big');await SHR.db.doc('prices/current').set(pay);SHR.ts=ts;SHR.applied=true;shm='🌐 บันทึกราคาให้ <b>ทุกเครื่อง</b> แล้ว — เครื่องอื่นจะเห็นราคานี้เมื่อเปิดหรือรีเฟรชหน้า'}catch(e){shm='⚠️ บันทึกไว้เฉพาะ<b>เครื่องนี้</b> — บัญชีนี้ไม่มีสิทธิ์แก้ข้อมูลที่ใช้ร่วมกัน ให้เจ้าของหรือผู้แก้ไขเป็นคนนำเข้าไฟล์'}}else shm='⚠️ บันทึกไว้เฉพาะ<b>เครื่องนี้</b> — ต้องเปิดผ่านลิงก์ claude.ai และเข้าสู่ระบบ จึงจะแชร์ราคาให้ทุกเครื่องได้';
  if(label){D.dt=label;S.dt=label;$('#dt').value=label}
  D.P.forEach(rf);drawP();draw();holdNote();
- const nm=Object.keys(m).length;
- let h=`✅ นำเข้า <b>${E(file.name)}</b> แล้ว${zone?' · '+E(zone):''}${label?' · รอบ '+E(label):''}<br>ปรับราคา <b>${nm}</b> รายการ (ราคาเปลี่ยนจากเดิม ${changed.length}) · ล้างราคาที่แก้มือ ${cleared} รายการ · ในระบบแต่ไม่อยู่ในไฟล์ ${notIn} รายการ (ใช้ราคาเดิม)<br>${shm}`;
+ const nm=Object.keys(ms).length;zui();
+ let h=`✅ นำเข้า <b>${E(file.name)}</b> แล้ว${sel?' · <b>'+E(sel)+'</b>':''}${label?' · รอบ '+E(label):''}<br>ปรับราคา <b>${nm}</b> รายการ (ราคาเปลี่ยนจากเดิม ${changed.length}) · ล้างราคาที่แก้มือ ${cleared} รายการ · ในระบบแต่ไม่อยู่ในไฟล์ ${notIn} รายการ (ใช้ราคาเดิม)<br>${shm}`;
  if(label)h+=`<br>ตั้งวันที่บนป้ายเป็น <b>${E(label)}</b> แล้ว (แก้ได้ที่ช่อง "ระยะเวลาโปร")`;
  if(bad.length)h+=`<br>⚠️ ข้ามชีต: ${E(bad.join(' · '))}`;
  if(changed.length)h+=`<details><summary>รายการที่ราคาเปลี่ยน (${changed.length})</summary><div class="sc"><table><tr><th>รหัส</th><th>ชื่อสินค้า</th><th>เดิม</th><th>ใหม่</th></tr>${changed.map(x=>`<tr><td>${x.p.c}</td><td>${E(x.p.n)}</td><td>${x.prev??'-'}</td><td>${x.db}</td></tr>`).join('')}</table></div></details>`;
@@ -269,17 +282,19 @@ async function doImport(file){
  h+=`<div style="margin-top:8px"><button class="btn g" id="imprs">↩️ กลับไปใช้ราคาเริ่มต้นของระบบ</button></div>`;
  impShow(h)}
 function holdNote(){const n=$('#holdn'),parts=[],dl=u=>{const m=u.split('-');return `${+m[2]} ${THM[+m[1]-1]} ${String(+m[0]+543).slice(-2)}`};if(holdOn()){const L=HOLD.codes.map(c=>B[c]).filter(Boolean).map(p=>`${E(p.n)} <b>${p.o0??'-'}</b>${p.p0!=null&&p.p0!==p.o0?` <small style="color:var(--mu)">(ปัจจุบัน ${p.p0})</small>`:''}`);parts.push(`⏳ ใช้ <b>ราคารอบก่อนหน้า</b> ถึงวันที่ <b>${dl(HOLD.until)}</b> แล้วกลับไปใช้ราคาปัจจุบันอัตโนมัติ<br><small>${L.join(' · ')}</small>`)}if(D.dt===TEMP.round){const on=holdOn(TEMP.until),L=Object.keys(TEMP.prices).map(c=>B[c]).filter(Boolean).map(p=>on?`${E(p.n)} <b>${TEMP.prices[p.c]}</b> <small style="color:var(--mu)">(เดิม ${p.o0})</small>`:`${E(p.n)} <b>${p.o0}</b>`);parts.push(on?`💲 <b>ปรับราคาชั่วคราว</b> ถึงวันที่ <b>${dl(TEMP.until)}</b> แล้วกลับไปใช้ <b>ราคารอบก่อนหน้า</b> อัตโนมัติ<br><small>${L.join(' · ')}</small>`:`⏳ ใช้ <b>ราคารอบก่อนหน้า</b> (พ้นช่วงราคาชั่วคราว ${dl(TEMP.until)} แล้ว) · เลิกใช้เองเมื่อนำเข้าไฟล์ราคารอบใหม่<br><small>${L.join(' · ')}</small>`)}if(!parts.length){n.style.display='none';return}n.style.display='';n.innerHTML=parts.join('<hr style="border:0;border-top:1px solid var(--bd);margin:8px 0">')}
-async function impReset(){D.P.forEach(p=>{p.p0=p.p1;p.o0=p.o1;p.d0=p.d1});D.dt=D0DT;D.P.forEach(rf);S.dt=D0DT;$('#dt').value=D0DT;IMP=null;try{localStorage.removeItem('imp')}catch(e){}drawP();draw();holdNote();let m2='';if(SHR.db&&SHR.cur){try{SHR.applied=false;await SHR.db.doc('prices/current').delete();m2=' · ล้างราคาที่ใช้ร่วมกันของทุกเครื่องแล้ว'}catch(e){m2=' · ⚠️ ล้างราคาที่ใช้ร่วมกันไม่ได้ (ไม่มีสิทธิ์) เครื่องอื่นยังใช้ราคาเดิม'}}impShow('↩️ กลับไปใช้ราคาเริ่มต้นของระบบแล้ว'+m2)}
+async function impReset(){D.P.forEach(p=>{p.p0=p.p1;p.o0=p.o1;p.d0=p.d1});D.dt=D0DT;D.P.forEach(rf);S.dt=D0DT;$('#dt').value=D0DT;IMP=null;ZSRC=null;try{localStorage.removeItem('imp')}catch(e){}drawP();draw();holdNote();zui();let m2='';if(SHR.db&&SHR.cur){try{SHR.applied=false;await SHR.db.doc('prices/current').delete();m2=' · ล้างราคาที่ใช้ร่วมกันของทุกเครื่องแล้ว'}catch(e){m2=' · ⚠️ ล้างราคาที่ใช้ร่วมกันไม่ได้ (ไม่มีสิทธิ์) เครื่องอื่นยังใช้ราคาเดิม'}}impShow('↩️ กลับไปใช้ราคาเริ่มต้นของระบบแล้ว'+m2)}
+function zui(){const w=$('#znw'),z=$('#zn'),s=ZSRC;if(!s||!s.zn||s.zn.length<2){w.style.display='none';return}w.style.display='';const cur=s.zn.includes(ZSEL)?ZSEL:(s.zb||s.zn[0]);z.innerHTML=s.zn.map(n=>`<option${n===cur?' selected':''}>${E(n)}</option>`).join('')}
+$('#zn').onchange=()=>{const s=ZSRC;if(!s)return;ZSEL=$('#zn').value;try{localStorage.setItem('zone',ZSEL)}catch(e){}const n=Object.keys(OV).length;applyShared(zm(s,ZSEL),s.dt,s);if(n)impShow(`📍 เปลี่ยนเป็น <b>${E(ZSEL)}</b> แล้ว · ล้างราคาที่แก้มือ ${n} รายการ (เพราะเป็นราคาของเขตก่อนหน้า)`);else impShow(`📍 ใช้ราคา <b>${E(ZSEL)}</b> แล้ว`)};
 $('#imp').onclick=()=>$('#impf').click();
 $('#impf').addEventListener('change',e=>{const f=e.target.files[0];e.target.value='';doImport(f)});
 $('#impst').addEventListener('click',async e=>{const id=e.target.id;
  if(id==='imprs'){if(SHR.db&&SHR.cur&&!SHR.confirm){SHR.confirm=1;e.target.textContent='กดอีกครั้งเพื่อยืนยัน (มีผลกับทุกเครื่อง)';return}SHR.confirm=0;impReset()}
- else if(id==='impsh'&&IMP&&SHR.db){try{await SHR.db.doc('prices/current').set({base:IMP.base,dt:IMP.dt,name:IMP.name,ts:IMP.ts||Date.now(),m:IMP.m});SHR.applied=true;impShow('🌐 แชร์ราคานี้ให้ทุกเครื่องแล้ว')}catch(err){impShow('⚠️ แชร์ไม่ได้ — บัญชีนี้ไม่มีสิทธิ์แก้ข้อมูลที่ใช้ร่วมกัน',1)}}});
+ else if(id==='impsh'&&IMP&&SHR.db){try{await SHR.db.doc('prices/current').set({base:IMP.base,dt:IMP.dt,name:IMP.name,ts:IMP.ts||Date.now(),m:IMP.m,zb:IMP.zb,zn:IMP.zn,cl:IMP.cl,zd:IMP.zd});SHR.applied=true;impShow('🌐 แชร์ราคานี้ให้ทุกเครื่องแล้ว')}catch(err){impShow('⚠️ แชร์ไม่ได้ — บัญชีนี้ไม่มีสิทธิ์แก้ข้อมูลที่ใช้ร่วมกัน',1)}}});
 const hasF=e=>e.dataTransfer&&[...(e.dataTransfer.types||[])].includes('Files');
 ['dragenter','dragover'].forEach(ev=>window.addEventListener(ev,e=>{if(hasF(e)){e.preventDefault();$('#dz').classList.add('on')}}));
 window.addEventListener('dragleave',e=>{if(!e.relatedTarget)$('#dz').classList.remove('on')});
 window.addEventListener('drop',e=>{$('#dz').classList.remove('on');if(hasF(e)){e.preventDefault();if(e.dataTransfer.files.length)doImport(e.dataTransfer.files[0])}});
 (async()=>{try{if(!window.claude||!claude.use)return;const db=await claude.use('db');if(!db)return;SHR.db=db;db.doc('prices/current').onSnapshot(onShared,()=>{})}catch(e){}})();
 S.dt=D.dt;if(IMP)impShow(`ใช้ราคาจากไฟล์ที่นำเข้าไว้: <b>${E(IMP.name)}</b>${IMP.dt?' · รอบ '+E(IMP.dt):''} <button class="btn g" id="imprs" style="margin-left:8px">↩️ กลับไปใช้ราคาเริ่มต้นของระบบ</button>`);
-holdNote();$('#dt').value=D.dt;$('#end').value=new Date().toISOString().slice(0,10);draw();
+holdNote();zui();$('#dt').value=D.dt;$('#end').value=new Date().toISOString().slice(0,10);draw();
 </script></body></html>
